@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from connection import posts as my_posts, conn, cursor
 # from .models import models
 import models
-from database import engine, SessionLocal, get_db  
+from database import engine, get_db  
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
