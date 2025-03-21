@@ -62,7 +62,7 @@ def create_post(post: Post, db: Session = Depends(get_db)):
         # cursor.execute/itle,post.content, post.published)) # %s is a variable value that will be replaced by the values in the tuple 
     # new_post  = cursor.fetchone()
     # conn.commit() # commit the transaction and save the changes
-    print(post.model_dump()) # Another way to get the data from the post object
+    # print(post.model_dump()) # Another way to get the data from the post object
     new_post = models.Post(**post.model_dump())
     db.add(new_post)    # For actually adding the data to the database
     db.commit()
@@ -92,13 +92,18 @@ def get_latest_post():
 
 
 @app.get("/posts/{id}")
-def get_post(id: int):
-    cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
-    # cursor.execute("SELECT * FROM posts WHERE id = %s", [id]) 
-    # cursor.execute("SELECT * FROM posts WHERE id = %s", (id,))
+def get_post(id: int, db: Session = Depends(get_db)):   
+    # cursor.execute("""SELECT * FROM posts WHERE id = %s """, (str(id),))
+    # # cursor.execute("SELECT * FROM posts WHERE id = %s", [id]) 
+    # # cursor.execute("SELECT * FROM posts WHERE id = %s", (id,))
 
-    post = cursor.fetchone()
+    # post = cursor.fetchone()
 
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with id {id} not found") 
+
+ 
     return {"data": post}
 
 
