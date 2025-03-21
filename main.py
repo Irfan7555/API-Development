@@ -56,14 +56,19 @@ def get_posts():
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post):
+def create_post(post: Post, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts (title, content, published) VALUES ({post.title}, {post.content}, {post.published})""")
 
         # cursor.execute/itle,post.content, post.published)) # %s is a variable value that will be replaced by the values in the tuple 
-    new_post  = cursor.fetchone()
-    conn.commit() # commit the transaction and save the changes
+    # new_post  = cursor.fetchone()
+    # conn.commit() # commit the transaction and save the changes
 
-    return {"data": new_post} 
+    new_post = models.Post(title=post.title, content=post.content, published=post.published)
+    db.add(new_post)    # For actually adding the data to the database
+    db.commit()
+    db.refresh(new_post)
+    return {"data": new_post}
+    # return {"data": new_post} 
     
     
 
@@ -117,10 +122,16 @@ def update_post(id: int, post: Post):
     return {"data": post_dict}
 
 
+@app.get("/sql/posts/")
+def sql_get_posts():
+    cursor.execute("SELECT * FROM posts")
+    posts = cursor.fetchall()
+    return {"data": posts}
+
 # Testing sqlachemy
 @app.get("/sqlalchemy")
 def test_posts(db: Session = Depends(get_db)):
-    # posts = db.query(models.Post).all()
-    posts = db.query(models.Post)
+    posts = db.query(models.Post).all()
+    # posts = db.query(models.Post)
     print(posts)
-    return {"data": "success"}
+    return {"data": posts}
