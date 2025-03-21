@@ -62,8 +62,8 @@ def create_post(post: Post, db: Session = Depends(get_db)):
         # cursor.execute/itle,post.content, post.published)) # %s is a variable value that will be replaced by the values in the tuple 
     # new_post  = cursor.fetchone()
     # conn.commit() # commit the transaction and save the changes
-
-    new_post = models.Post(title=post.title, content=post.content, published=post.published)
+    print(post.dict()) # Another way to get the data from the post object
+    new_post = models.Post(**post.dict())
     db.add(new_post)    # For actually adding the data to the database
     db.commit()
     db.refresh(new_post)
