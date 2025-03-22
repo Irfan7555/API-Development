@@ -109,12 +109,21 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.delete("/posts/{id}")
-def delete_post(id: int):
-    post = find_post(id)
-    if not post:
+def delete_post(id: int, db: Session = Depends(get_db)):
+    # post = find_post(id)
+    # if not post:
+    #     raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
+    # my_posts.remove(post)
+    # return {"data": f"Post with id {id} deleted successfully"}
+
+    post = db.query(models.Post).filter(models.Post.id == id)
+    if post.first() == None:
         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
-    my_posts.remove(post)
+    post.delete(synchronize_session=False)
+    db.commit()
     return {"data": f"Post with id {id} deleted successfully"}
+
+
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
