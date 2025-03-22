@@ -151,13 +151,13 @@ def test_posts(db: Session = Depends(get_db)):
     return {"data": posts}
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
     if post == None:
         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
-    post_query.update(post.model_dump(), synchronize_session=False)
+    post_query.update(updated_post.model_dump(), synchronize_session=False)
     db.commit()
 
     return {"data": post_query.first()}
