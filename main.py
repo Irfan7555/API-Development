@@ -125,15 +125,15 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 
-@app.put("/posts/{id}")
-def update_post(id: int, post: Post):
-    post_index = find_post_index(id)
-    if post_index is None:
-        raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
-    post_dict =  post.model_dump()
-    post_dict["id"] = id
-    my_posts[post_index] =post_dict
-    return {"data": post_dict}
+# @app.put("/posts/{id}")
+# def update_post(id: int, post: Post):
+#     post_index = find_post_index(id)
+#     if post_index is None:
+#         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
+#     post_dict =  post.model_dump()
+#     post_dict["id"] = id
+#     my_posts[post_index] =post_dict
+#     return {"data": post_dict}
 
 
 @app.get("/sql/posts/")
@@ -149,3 +149,15 @@ def test_posts(db: Session = Depends(get_db)):
     # posts = db.query(models.Post)
     print(posts)
     return {"data": posts}
+
+@app.put("/posts/{id}")
+def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
+    post_query.update(post.model_dump(), synchronize_session=False)
+    db.commit()
+
+    return {"data": post_query.first()}
