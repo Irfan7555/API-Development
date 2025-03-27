@@ -6,10 +6,12 @@ from database import get_db
 from schemas import UserCreate, UserOut
 from utils import hash
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users"
+)
 
 
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserOut)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     # Hash Password
@@ -22,13 +24,13 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get("/users", response_model=List[UserOut])
+@router.get("/", response_model=List[UserOut])
 def get_users(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return users
 
 
-@router.get("/users/{id}", response_model=UserOut)
+@router.get("/{id}", response_model=UserOut)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:

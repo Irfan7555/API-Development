@@ -6,9 +6,11 @@ import models
 from database import get_db
 from schemas import PostCreate, Post
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/posts",
+)
 
-@router.get("/posts", response_model= List[Post])
+@router.get("/", response_model= List[Post])
 def test_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     # posts = db.query(models.Post)
@@ -16,7 +18,7 @@ def test_posts(db: Session = Depends(get_db)):
     return posts
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=Post)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post)
 def create_post(post: PostCreate, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)    # For actually adding the data to the database
@@ -24,7 +26,7 @@ def create_post(post: PostCreate, db: Session = Depends(get_db)):
     db.refresh(new_post)
     return new_post
     
-@router.delete("/posts/{id}", response_model=Post)
+@router.delete("/{id}", response_model=Post)
 def delete_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id)
     if post.first() == None:
@@ -33,7 +35,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"data": f"Post with id {id} deleted successfully"}
 
-@router.put("/posts/{id}", response_model=Post)
+@router.put("/{id}", response_model=Post)
 def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
