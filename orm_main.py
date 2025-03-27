@@ -1,12 +1,6 @@
-from executing import cache
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI
 import models
-from database import engine, get_db  
-from sqlalchemy.orm import Session
-from fastapi import Depends
-from schemas import PostCreate, Post, UserCreate, UserOut
-from typing import List
-from utils import hash
+from database import engine
 from routers import post, user
 
 models.Base.metadata.create_all(bind=engine)
