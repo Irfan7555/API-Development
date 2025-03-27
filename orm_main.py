@@ -1,16 +1,18 @@
+from executing import cache
 from fastapi import FastAPI, status, HTTPException
 import models
 from database import engine, get_db  
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from schemas import PostCreate, Post
+from schemas import PostCreate, Post, UserCreate, UserOut
+from typing import List
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-@app.get("/posts")
+@app.get("/posts", response_model= List[Post])
 def test_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     # posts = db.query(models.Post)
@@ -26,7 +28,7 @@ def create_post(post: PostCreate, db: Session = Depends(get_db)):
     db.refresh(new_post)
     return new_post
     
-@app.delete("/posts/{id}")
+@app.delete("/posts/{id}", response_model=Post)
 def delete_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id)
     if post.first() == None:
@@ -35,7 +37,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"data": f"Post with id {id} deleted successfully"}
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=Post)
 def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
@@ -53,6 +55,19 @@ def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)
     return post_query.first()
 
 
-import uvicorn
-if __name__ == "__main__":
-    uvicorn.run("orm_main:app", host="127.0.0.1", port=8000, reload=True)
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserOut)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    new_user = models.User(**user.model_dump())  
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+@app.get("/users", response_model=List[UserCreate])
+def get_users(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    return users
+
+
+
