@@ -3,13 +3,11 @@ import models
 from database import engine, get_db  
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from schemas import Post
+from schemas import PostCreate
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
 
 
 @app.get("/posts")
@@ -17,16 +15,16 @@ def test_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     # posts = db.query(models.Post)
     print(posts)
-    return {"data": posts}
+    return posts
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):
+def create_post(post: PostCreate, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)    # For actually adding the data to the database
     db.commit()
     db.refresh(new_post)
-    return {"data": new_post}
+    return new_post
     
 @app.delete("/posts/{id}")
 def delete_post(id: int, db: Session = Depends(get_db)):
@@ -38,7 +36,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return {"data": f"Post with id {id} deleted successfully"}
 
 @app.put("/posts/{id}")
-def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
@@ -52,6 +50,6 @@ def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
     post_query.update(update_data, synchronize_session=False)
     db.commit()
 
-    return {"data": post_query.first()}
+    return post_query.first()
 
     
