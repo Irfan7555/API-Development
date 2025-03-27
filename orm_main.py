@@ -6,10 +6,8 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from schemas import PostCreate, Post, UserCreate, UserOut
 from typing import List
-from passlib.context import CryptContext
+from utils import hash
 
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -62,7 +60,7 @@ def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
     # Hash Password
-    hashed_password = pwd_context.hash(user.password)
+    hashed_password = hash(user.password)
     user.password = hashed_password
     new_user = models.User(**user.model_dump())  
     db.add(new_user)
