@@ -33,6 +33,7 @@ class Post(PostBase):
     class Config:
         # orm_mode = True
         from_attributes = True
+        # This is used to convert the SQLAlchemy object to a Pydantic model.
 
 class UserCreate(BaseModel):
     email: EmailStr
