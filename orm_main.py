@@ -3,7 +3,7 @@ import models
 from database import engine, get_db  
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from schemas import PostCreate
+from schemas import PostCreate, Post
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -18,7 +18,7 @@ def test_posts(db: Session = Depends(get_db)):
     return posts
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=Post)
 def create_post(post: PostCreate, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump())
     db.add(new_post)    # For actually adding the data to the database
@@ -52,4 +52,7 @@ def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)
 
     return post_query.first()
 
-    
+
+import uvicorn
+if __name__ == "__main__":
+    uvicorn.run("orm_main:app", host="127.0.0.1", port=8000, reload=True)
