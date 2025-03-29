@@ -1,6 +1,7 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
+
 # SECKEY_KEY
 # ALGORITHM
 # Expiration time
