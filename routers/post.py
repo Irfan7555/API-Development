@@ -8,7 +8,7 @@ from schemas import PostCreate, Post
 
 router = APIRouter(
     prefix="/posts",
-    tags=["posts"] 
+    tags=["Posts"] 
 )
 
 @router.get("/", response_model= List[Post])
