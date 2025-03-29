@@ -12,13 +12,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 SECKEY_KEY = "5vsddcjcnskcscdscsjkdndc558gfmitriotg79gvfvj" # This should be a long, random string
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30 
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 def create_access_token(data:dict):
     to_encode = data.copy()
     
-    expire =  datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) # If error occur change this to .utcnow()
+    expire =  datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) # If error occur change this to .utcnow()
     to_encode.update({"exp":expire})
     encoded_jwt = jwt.encode(to_encode, SECKEY_KEY, algorithm=ALGORITHM)
 
@@ -31,7 +31,7 @@ def verify_access_token(token:str, credentials_exception):
         payload = jwt.decode(token, SECKEY_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
 
-        if not id:
+        if not user_id:
             raise credentials_exception
         token_data = TokenData(id= str(user_id))
 
