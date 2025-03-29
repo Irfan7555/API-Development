@@ -5,6 +5,7 @@ from typing import List
 import models
 from database import get_db
 from schemas import PostCreate, Post
+from oauth2 import create_access_token, verify_access_token, get_current_user
 
 router = APIRouter(
     prefix="/posts",
@@ -20,7 +21,8 @@ def test_posts(db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post)
-def create_post(post: PostCreate, db: Session = Depends(get_db)):
+def create_post(post: PostCreate, db: Session = Depends(get_db), user_id: int= Depends(get_current_user)):
+    print(user_id)
     new_post = models.Post(**post.model_dump())
     db.add(new_post)    # For actually adding the data to the database
     db.commit()
