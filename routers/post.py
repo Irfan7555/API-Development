@@ -29,8 +29,8 @@ def create_post(post: PostCreate, db: Session = Depends(get_db), user_id: int= D
     db.refresh(new_post)
     return new_post
     
-@router.delete("/{id}", response_model=Post)
-def delete_post(id: int, db: Session = Depends(get_db)):
+@router.delete("/{id}")
+def delete_post(id: int, db: Session = Depends(get_db), user_id: int= Depends(get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == id)
     if post.first() == None:
         raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
@@ -39,7 +39,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return {"data": f"Post with id {id} deleted successfully"}
 
 @router.put("/{id}", response_model=Post)
-def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db), user_id: int= Depends(get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
