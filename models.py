@@ -14,7 +14,7 @@ class Post(Base):
     # created_at = Column(TIMESTAMP(timezone=True), server_default='now()')
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    owner = relationship("User")
+    owner = relationship("User") # sqlalchemy simple param for relationship between tables
 
 
 class User(Base):
