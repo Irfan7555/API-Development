@@ -20,6 +20,13 @@ def test_posts(db: Session = Depends(get_db), current_user: int= Depends(get_cur
     return posts
 
 
+@router.get("/{id}", response_model=Post)
+def get_one_post(id: int, db: Session = Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == id).first()  # Fix filter condition
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with id {id} not found")
+    return post
+
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post)
 def create_post(post: PostCreate, db: Session = Depends(get_db), current_user: int= Depends(get_current_user)):
     print(current_user)
