@@ -13,8 +13,8 @@ router = APIRouter(
 )
 
 @router.get("/", response_model= List[Post])
-def test_posts(db: Session = Depends(get_db), current_user: int= Depends(get_current_user)):
-    posts = db.query(models.Post).all()
+def test_posts(db: Session = Depends(get_db), current_user: int= Depends(get_current_user), limit: int =10):
+    posts = db.query(models.Post).limit(limit).all()
     # posts = db.query(models.Post)
     print(posts)
     return posts
