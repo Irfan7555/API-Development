@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status   # Importing the necessary modules
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import models
 from database import get_db
 from schemas import PostCreate, Post
@@ -12,12 +12,15 @@ router = APIRouter(
     tags=["Posts"] 
 )
 
-@router.get("/", response_model= List[Post])
-def test_posts(db: Session = Depends(get_db), current_user: int= Depends(get_current_user), limit: int =10):
+@router.get("/", response_model=List[Post])
+def test_posts(
+    db: Session = Depends(get_db),
+    current_user: int = Depends(get_current_user),
+    limit: int = 10
+):
     posts = db.query(models.Post).limit(limit).all()
-    # posts = db.query(models.Post)
-    print(posts)
     return posts
+
 
 
 @router.get("/{id}", response_model=Post)
